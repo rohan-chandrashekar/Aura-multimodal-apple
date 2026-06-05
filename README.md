@@ -1,8 +1,10 @@
 # Aura — On-Device Multimodal Accessibility Assistant
 
-A private, real-time perceptual aid for blind/low-vision and deaf/hard-of-hearing users, running entirely on Apple Silicon. It describes the scene and reads text aloud, captions and enhances speech, and fuses sound events with visual context — with no camera or microphone data ever leaving the device.
+A private, real-time perceptual aid for blind/low-vision and deaf/hard-of-hearing users, running entirely on-device. It describes the scene and reads text aloud, captions and enhances speech, and fuses sound events with visual context — with no camera or microphone data ever leaving the device.
 
-Built on Apple's native stack: **AVFoundation**, **Speech** (on-device), **SoundAnalysis**, **Vision**, **AVSpeechSynthesizer**, and **Core ML** on the Neural Engine.
+Built on Apple's native stack: **AVFoundation**, **Speech** (on-device), **SoundAnalysis**, **Vision**, **AVSpeechSynthesizer**, and **Core ML**.
+
+**Current hardware:** MacBook Pro (i5-1038NG7, 16 GB). Core ML runs on CPU/GPU. Final benchmarks on Apple Silicon will use the Neural Engine.
 
 ## The problem
 
@@ -10,14 +12,14 @@ Blind/low-vision and deaf/hard-of-hearing people need to understand their immedi
 
 ## Results
 
-Measured on Apple Silicon, not estimated. Filled in as each phase completes.
+Measured on this machine, not estimated. Filled in as each phase completes.
 
 ### Hearing mode (Phases 0–1)
 
 | Metric | Clean | Noisy | Enhanced |
 |---|---|---|---|
-| Word error rate (%) | _tbd_ | _tbd_ | _tbd_ |
-| Caption latency (ms) | _tbd_ | — | _tbd_ |
+| Word error rate (%) | 7.1 (Intel, en_IN) | _tbd_ | _tbd_ |
+| Caption latency — mean / median / p95 (ms) | 5672 / 5918 / 9041 (Intel) | — | _tbd_ |
 | SNR gain (dB) | — | — | _tbd_ |
 | Audio bytes written to disk | 0 | 0 | 0 |
 
