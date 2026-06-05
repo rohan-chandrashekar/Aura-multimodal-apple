@@ -7,6 +7,7 @@ let arguments = CommandLine.arguments
 let measureMode = arguments.contains("--measure")
 let enhanceMode = arguments.contains("--enhance")
 let visionMode = arguments.contains("--vision")
+let multimodalMode = arguments.contains("--multimodal")
 let showHelp = arguments.contains("--help") || arguments.contains("-h")
 
 func argValue(for flag: String) -> String? {
@@ -17,6 +18,7 @@ func argValue(for flag: String) -> String? {
 
 let evaluateDir = argValue(for: "--evaluate")
 let visionEvalDir = argValue(for: "--vision-eval")
+let soundEvalDir = argValue(for: "--sound-eval")
 
 if showHelp {
     print("""
@@ -32,13 +34,49 @@ if showHelp {
       swift run Aura --vision                   Live scene description from camera
       swift run Aura --vision-eval <dir>        Evaluate detection+OCR on labeled images
 
+    Multimodal mode:
+      swift run Aura --multimodal               Sound events fused with camera context
+      swift run Aura --sound-eval <dir>         Evaluate sound classification on audio files
+
     Permissions (System Settings → Privacy & Security):
       • Microphone, Speech Recognition — for hearing mode
-      • Camera — for vision mode
+      • Camera — for vision mode and multimodal mode
 
     All audio/video is processed in memory. Nothing is written to disk or sent over the network.
     """)
     exit(0)
+}
+
+if multimodalMode {
+    print("Aura — Multimodal Mode")
+    let fusion = MultimodalMode()
+    do {
+        try fusion.start()
+        print("Multimodal mode active. Listening for sounds + watching camera. Ctrl+C to stop.\n")
+    } catch {
+        print("Failed to start: \(error.localizedDescription)")
+        print("Grant Microphone and Camera access in System Settings → Privacy & Security.")
+        exit(1)
+    }
+
+    let source = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
+    signal(SIGINT, SIG_IGN)
+    source.setEventHandler {
+        fusion.stop()
+        exit(0)
+    }
+    source.resume()
+    dispatchMain()
+}
+
+if let dir = soundEvalDir {
+    print("Aura — Sound Classification Evaluation")
+    let absDir = dir.hasPrefix("/") ? dir : FileManager.default.currentDirectoryPath + "/" + dir
+    let evaluator = SoundEvaluator()
+    DispatchQueue.main.async {
+        evaluator.evaluateDirectory(absDir)
+    }
+    dispatchMain()
 }
 
 if visionMode {

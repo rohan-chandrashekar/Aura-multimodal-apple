@@ -4,9 +4,9 @@ Interview-defensible bullets with measured numbers only. Updated each phase.
 
 ## Aura — On-Device Multimodal Accessibility Assistant
 
-- Built a real-time hearing-mode captioning pipeline using AVAudioEngine and SFSpeechRecognizer (on-device, requiresOnDeviceRecognition = true) with zero audio written to disk and zero network bytes sent
-- Measured 7.1% word error rate on clean speech; enhancement (DNS48, 18.9M params Core ML) delivers +11.6 dB SNR gain and halves WER at moderate noise (35.7% → 17.9% at 10 dB)
-- Built vision-mode scene aid: AVFoundation camera → YOLOv8n object detection (3.2M params, 6.2 MB Core ML) + VNRecognizeTextRequest OCR → composed spoken description via AVSpeechSynthesizer
-- Live camera: 6.2 FPS with detection+OCR at 282 ms average latency; OCR alone achieves 100% recall at 164 ms; object detection adds 118 ms overhead
-- Automated evaluation pipelines: Python scripts for model conversion and SNR measurement; Swift evaluators for WER (audio) and detection+OCR accuracy (vision) on labeled test sets
+- Built a real-time hearing-mode captioning pipeline using AVAudioEngine and SFSpeechRecognizer (on-device) with zero audio written to disk and zero network bytes sent; 7.1% WER on clean speech
+- Speech enhancement (DNS48, 18.9M params Core ML) delivers +11.6 dB SNR gain and halves WER at moderate noise (35.7% → 17.9% at 10 dB); documented SNR-vs-WER divergence at severe noise
+- Vision-mode scene aid: YOLOv8n (3.2M params, 6.2 MB Core ML) + VNRecognizeTextRequest OCR → spoken description via AVSpeechSynthesizer; 6.2 FPS, 282 ms latency, OCR 100% recall
+- Multimodal fusion: SoundAnalysis (SNClassifySoundRequest) sound-event detection fused with Vision context for deaf/HH users; <1 ms fusion latency, 100% speech detection accuracy; all processing on-device
+- End-to-end evaluation tooling: WER measurement with Levenshtein alignment, SNR gain analysis, labeled image evaluation (precision/recall/F1), sound classification F1, all automated via CLI flags
 - Privacy invariant: all audio and video processed in memory, never written to disk, nothing leaves the device

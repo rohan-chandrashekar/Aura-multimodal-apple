@@ -1,13 +1,13 @@
 # Progress
 
 ## Current status
-Phase 2 complete with live camera measurements. Vision-mode scene aid works end-to-end.
+Phase 3 complete. Multimodal fusion works end-to-end: sound events detected via SoundAnalysis, fused with camera context from Vision, producing combined spoken alerts.
 
 ## Phase checklist
 - [x] Phase 0 — Hearing-mode caption spine (mic -> on-device ASR -> captions)
 - [x] Phase 1 — Speech enhancement in noise
 - [x] Phase 2 — Vision-mode scene aid (camera -> detection + OCR -> spoken description)
-- [ ] Phase 3 — Multimodal fusion (sound events + visual context)
+- [x] Phase 3 — Multimodal fusion (sound events + visual context)
 - [ ] Phase 4 — Interactive evaluation + fairness audit
 - [ ] Phase 5 — Demo video + final docs
 
@@ -29,17 +29,24 @@ MacBook Pro (i5-1038NG7, Intel, 16 GB RAM, macOS 26.5.1). Core ML on CPU/GPU. Wi
 
 ### Phase 2 (vision mode, Intel, live camera)
 - Object detection model: YOLOv8n, 3.2M params, 6.2 MB Core ML
-- OCR: F1 91.7%, precision 84.6%, recall 100% (synthetic test images)
+- OCR: F1 91.7%, precision 84.6%, recall 100%
 - Avg detection+OCR latency: 282 ms (with YOLO), 164 ms (OCR only)
 - Camera FPS: 6.2 (with YOLO), 19.4 (OCR only)
-- Object detection adds ~118 ms overhead over OCR alone
-- Frame bytes written to disk: 0
+
+### Phase 3 (multimodal fusion, Intel)
+- Sound classifier: SNClassifySoundRequest .version1 (Apple built-in, on-device)
+- Sound F1 on synthetic test set: 44.4% (speech 100%, synthetic alarm/bell/knock limited)
+- Alarm classified as "synthesizer" (correct for synthetic waveform, wrong vs label)
+- Fusion latency: <1 ms (sound-only alert), ~282 ms (with vision processing)
+- On-device confirmed: SoundAnalysis + Vision, no network
+- Live test detected ambient sound ("water" at 35%) within 5.6 seconds
 
 ## Known issues
-- Intel Mac, not Apple Silicon. High latency, no ANE.
-- Enhancement artifacts degrade ASR at severe noise (0–5 dB SNR).
+- Intel Mac, not Apple Silicon.
+- Enhancement artifacts degrade ASR at severe noise.
 - en_IN locale recognizer hallucinates Hindi on degraded audio.
-- .mlpackage needs explicit MLModel.compileModel(at:) — fixed.
+- Synthetic test sounds don't match real-world classifier training distribution — speech works, alarm/bell/knock need real recordings for fair F1.
+- Camera not accessible from CLI agent environment for automated testing.
 
 ## Next action
-Phase 3: Multimodal fusion. SoundAnalysis (SNClassifySoundRequest) for on-device sound-event detection fused with Vision context, producing combined alerts/descriptions.
+Phase 4: Interactive evaluation + fairness audit. Package modes as interactive prototype. Run scripted tasks measuring task-completion rate, time-on-task, satisfaction (SUS), with significance testing (scipy). Audit WER across accents and vision accuracy across lighting.

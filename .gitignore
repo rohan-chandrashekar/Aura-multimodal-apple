@@ -22,6 +22,7 @@ participants/
 
 test_audio/
 test_images/
+test_sounds/
 
 .env
 .DS_Store

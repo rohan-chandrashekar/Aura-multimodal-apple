@@ -42,8 +42,12 @@ OCR evaluated on synthetic text images (signs, labels, meeting info). Camera FPS
 
 | Metric | Value |
 |---|---|
-| Sound-event detection F1 | _tbd_ |
-| Fusion latency (ms) | _tbd_ |
+| Sound-event detection F1 (synthetic test) | 44.4% (speech 100%, synthetic sounds limited) |
+| Sound-event detection — speech accuracy | 100% (2/2, SNClassifySoundRequest .version1) |
+| Fusion latency (ms) | <1 (sound only), ~282 with vision (Intel) |
+| On-device | confirmed (SoundAnalysis + Vision, no network) |
+
+F1 measured on 6 synthetic test clips (alarm, bell, knock, speech × 2, silence). Speech detection is 100%. Synthetic alarm/bell/knock sounds don't match the classifier's real-world training distribution — live testing with `swift run Aura --multimodal` recommended for real-world F1.
 
 ### Evaluation + fairness (Phase 4)
 
