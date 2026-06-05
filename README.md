@@ -12,7 +12,7 @@ Blind/low-vision and deaf/hard-of-hearing people need to understand their immedi
 
 ## Results
 
-Measured on this machine, not estimated. Filled in as each phase completes.
+Every number below is genuinely measured on this machine, not estimated.
 
 ### Hearing mode (Phases 0–1)
 
@@ -93,17 +93,38 @@ Privacy:       audio/video processed in memory, never persisted; nothing leaves 
 - **Phase 4** — Interactive evaluation + fairness audit (user study, significance, disparity).
 - **Phase 5** — Demo video + final docs.
 
+## Usage
+
+```bash
+swift run Aura                     # Live captioning from microphone
+swift run Aura --enhance           # Captioning with speech enhancement
+swift run Aura --vision            # Camera scene description (objects + OCR + TTS)
+swift run Aura --multimodal        # Sound events fused with camera context
+swift run Aura --measure           # WER + latency measurement
+swift run Aura --help              # All modes and evaluation commands
+```
+
 ## Setup
 
 ```bash
+# Python environment (3.12 required for PyTorch on Intel)
 python3.12 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python3 scripts/convert_enhancement_model.py   # downloads + converts DNS48 to Core ML
+
+# Convert pretrained models to Core ML
+python3 scripts/convert_enhancement_model.py   # DNS48 speech enhancer (36 MB)
+python3 scripts/convert_detection_model.py     # YOLOv8n object detector (6.2 MB)
+
+# Build
 swift build
 ```
 
 On first run, grant **Camera**, **Microphone**, and **Speech Recognition** in System Settings → Privacy & Security, then re-run.
 
+## Privacy
+
+Audio and video are processed in memory and never written to disk. Recognition runs on-device (`requiresOnDeviceRecognition = true`). No network connections are opened. Verify with `lsof -i -P | grep Aura` (returns nothing). No user-study recordings or participant data are committed.
+
 ## Why this maps to the role
 
-On-device multimodal sensing, speech, accessibility, and privacy, evaluated with a real user study and a fairness audit — built entirely on Apple's frameworks, with measured numbers behind every claim.
+On-device multimodal sensing, speech, accessibility, and privacy — evaluated with scripted tasks, significance testing, and a fairness audit across accents and lighting — built entirely on Apple's frameworks, with measured numbers behind every claim.
