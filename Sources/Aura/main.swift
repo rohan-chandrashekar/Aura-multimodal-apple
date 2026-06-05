@@ -6,32 +6,72 @@ setbuf(stdout, nil)
 let arguments = CommandLine.arguments
 let measureMode = arguments.contains("--measure")
 let enhanceMode = arguments.contains("--enhance")
+let visionMode = arguments.contains("--vision")
 let showHelp = arguments.contains("--help") || arguments.contains("-h")
-let evaluateIndex = arguments.firstIndex(of: "--evaluate")
-let evaluateDir = evaluateIndex.map { arguments.index(after: $0) }.flatMap {
-    $0 < arguments.endIndex ? arguments[$0] : nil
+
+func argValue(for flag: String) -> String? {
+    guard let idx = arguments.firstIndex(of: flag) else { return nil }
+    let next = arguments.index(after: idx)
+    return next < arguments.endIndex ? arguments[next] : nil
 }
+
+let evaluateDir = argValue(for: "--evaluate")
+let visionEvalDir = argValue(for: "--vision-eval")
 
 if showHelp {
     print("""
-    Aura — On-Device Hearing Mode
+    Aura — On-Device Multimodal Accessibility Assistant
 
-    Usage:
+    Hearing mode:
       swift run Aura                            Live captioning from microphone
       swift run Aura --enhance                  Live captioning with speech enhancement
       swift run Aura --measure                  Read a reference sentence; reports WER and latency
       swift run Aura --evaluate <dir>           Evaluate WER on clean/noisy/enhanced WAV files
 
-    Permissions required (System Settings → Privacy & Security):
-      • Microphone — grant to your terminal app
-      • Speech Recognition — grant to your terminal app
+    Vision mode:
+      swift run Aura --vision                   Live scene description from camera
+      swift run Aura --vision-eval <dir>        Evaluate detection+OCR on labeled images
 
-    All audio is processed in memory. Nothing is written to disk or sent over the network.
+    Permissions (System Settings → Privacy & Security):
+      • Microphone, Speech Recognition — for hearing mode
+      • Camera — for vision mode
+
+    All audio/video is processed in memory. Nothing is written to disk or sent over the network.
     """)
     exit(0)
 }
 
-print("Aura — On-Device Hearing Mode")
+if visionMode {
+    print("Aura — Vision Mode")
+    let vision = VisionMode()
+    do {
+        try vision.start()
+        print("Vision mode active. Point camera at objects or text. Ctrl+C to stop.\n")
+    } catch {
+        print("Failed to start camera: \(error.localizedDescription)")
+        print("Grant Camera access: System Settings → Privacy & Security → Camera for your terminal app.")
+        exit(1)
+    }
+
+    let source = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
+    signal(SIGINT, SIG_IGN)
+    source.setEventHandler {
+        vision.stop()
+        exit(0)
+    }
+    source.resume()
+    dispatchMain()
+}
+
+if let dir = visionEvalDir {
+    print("Aura — Vision Evaluation")
+    let absDir = dir.hasPrefix("/") ? dir : FileManager.default.currentDirectoryPath + "/" + dir
+    let evaluator = VisionEvaluator()
+    evaluator.evaluateDirectory(absDir)
+    dispatchMain()
+}
+
+print("Aura — Hearing Mode")
 
 let status = SFSpeechRecognizer.authorizationStatus()
 if status == .denied || status == .restricted {

@@ -30,11 +30,15 @@ Enhancement model: Facebook DNS48 (Demucs), 18.9M parameters, 36 MB Core ML. SNR
 
 | Metric | Value |
 |---|---|
-| Object detection accuracy (%) | _tbd_ |
-| OCR accuracy (%) | _tbd_ |
-| End-to-end latency (ms) | _tbd_ |
-| FPS | _tbd_ |
+| Object detection model | YOLOv8n, 3.2M params, 6.2 MB Core ML |
+| Object detection accuracy | TBD — test with camera: `swift run Aura --vision` |
+| OCR F1 / precision / recall (%) | 91.7 / 84.6 / 100.0 |
+| End-to-end latency per frame (ms) | 567 median, 600 p95 (warm, Intel CPU) |
+| First-frame latency (ms) | ~9250 (includes Core ML model compilation) |
+| FPS | TBD — test with camera: `swift run Aura --vision` |
 | Frame bytes written to disk | 0 |
+
+OCR evaluated on 4 synthetic text images (signs, labels, meeting info). Object detection requires real photos via camera — pipeline verified end-to-end on 5 images with correct no-detection on non-COCO content.
 
 ### Multimodal sound awareness (Phase 3)
 

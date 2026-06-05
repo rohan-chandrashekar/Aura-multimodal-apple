@@ -1,52 +1,47 @@
 # Progress
 
 ## Current status
-Phase 1 complete. Speech enhancement model integrated and evaluated with full WER/SNR measurements.
+Phase 2 complete. Vision-mode scene aid works end-to-end: camera → detection + OCR → spoken description. OCR measured; object detection + FPS need camera test by user.
 
 ## Phase checklist
 - [x] Phase 0 — Hearing-mode caption spine (mic -> on-device ASR -> captions)
 - [x] Phase 1 — Speech enhancement in noise
-- [ ] Phase 2 — Vision-mode scene aid (camera -> detection + OCR -> spoken description)
+- [x] Phase 2 — Vision-mode scene aid (camera -> detection + OCR -> spoken description)
 - [ ] Phase 3 — Multimodal fusion (sound events + visual context)
 - [ ] Phase 4 — Interactive evaluation + fairness audit
 - [ ] Phase 5 — Demo video + final docs
 
 ## Hardware
-MacBook Pro (i5-1038NG7, Intel, 16 GB RAM, macOS 26.5.1). Core ML runs on CPU/GPU, no Neural Engine. Will re-measure on M-series Mac.
+MacBook Pro (i5-1038NG7, Intel, 16 GB RAM, macOS 26.5.1). Core ML on CPU/GPU. Will re-measure on M-series.
 
 ## Measured numbers
 
 ### Phase 0 (clean speech, Intel)
-- On-device recognition supported: true (locale en_IN)
-- Word error rate: 7.1% (28-word reference; errors: "jumps"→"jumped", "two"→"2")
-- Caption latency: mean 5672 ms, median 5918 ms, p95 9041 ms (n=23 segments)
-- Audio files written to disk: 0
-- Network bytes for recognition: 0
+- WER: 7.1% (28-word reference)
+- Caption latency: mean 5672 ms, median 5918 ms, p95 9041 ms
+- Audio files written: 0, network bytes: 0
 
 ### Phase 1 (speech enhancement, Intel)
-- Model: Facebook DNS48 (Demucs), 18.9M params, 36 MB Core ML
-- SNR gain: +11.6 dB (0 dB input), +9.2 dB (5 dB), +7.1 dB (10 dB)
-- WER table:
+- Model: Facebook DNS48, 18.9M params, 36 MB Core ML
+- SNR gain: +11.6 dB (0 dB), +9.2 dB (5 dB), +7.1 dB (10 dB)
+- WER: clean 7.1%, noisy 60.7/32.1/35.7%, enhanced 78.6/53.6/17.9% (0/5/10 dB)
+- Model latency: 1149 ms per 4s chunk (Intel CPU)
 
-| Condition | WER (%) |
-|-----------|---------|
-| Clean | 7.1 |
-| Noisy 0 dB | 60.7 |
-| Noisy 5 dB | 32.1 |
-| Noisy 10 dB | 35.7 |
-| Enhanced 0 dB | 78.6 |
-| Enhanced 5 dB | 53.6 |
-| Enhanced 10 dB | 17.9 |
-
-- Enhancement model latency: mean 1149 ms, median 1148 ms, p95 1159 ms (4s chunk, Intel CPU, n=20)
-- Key finding: SNR improves at all levels, but ASR WER only improves at moderate noise (10 dB). At severe noise (0–5 dB), enhancement artifacts degrade recognition. This is a known divergence between signal-level and ASR-level metrics.
+### Phase 2 (vision mode, Intel)
+- Object detection model: YOLOv8n, 3.2M params, 6.2 MB Core ML
+- OCR: F1 91.7%, precision 84.6%, recall 100% (5 test images, VNRecognizeTextRequest accurate mode)
+- End-to-end latency per frame: 567 ms median, 600 ms p95 (warm); ~9250 ms first frame (model compilation)
+- Object detection accuracy: TBD — needs real photos via `swift run Aura --vision`
+- Camera FPS: TBD — needs live camera test
+- Frame bytes written to disk: 0
 
 ## Known issues
-- Intel Mac, not Apple Silicon. Latency high, no ANE.
-- `SFSpeechRecognizer.requestAuthorization()` crashes CLI tools. Using `authorizationStatus()` instead.
-- Recognition task ~1 min timeout on silence; restart handles it.
-- Enhancement model requires Python 3.12 (PyTorch not available for 3.13 on x86_64).
-- en_IN locale recognizer hallucinates Hindi words on severely degraded audio — relevant for Phase 4 fairness audit.
+- Intel Mac, not Apple Silicon. High latency, no ANE.
+- Enhancement artifacts degrade ASR at severe noise (0–5 dB SNR).
+- en_IN locale recognizer hallucinates Hindi on degraded audio.
+- First vision frame has ~9s cold-start latency (Core ML model compilation).
+- Object detection accuracy unmeasured on synthetic images (YOLO needs real photos).
+- Camera not accessible from CLI agent environment; user must test `--vision` mode directly.
 
 ## Next action
-Phase 2: Vision-mode scene aid. AVFoundation camera → Vision object detection + VNRecognizeTextRequest OCR → composed spoken description via AVSpeechSynthesizer. No frames written to disk.
+Phase 3: Multimodal fusion. SoundAnalysis (SNClassifySoundRequest) for on-device sound-event detection fused with Vision context, producing combined alerts/descriptions.
