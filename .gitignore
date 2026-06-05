@@ -23,6 +23,10 @@ participants/
 test_audio/
 test_images/
 test_sounds/
+test_accents/
+test_accents_mitigated/
+test_lighting/
+test_lighting_mitigated/
 
 .env
 .DS_Store

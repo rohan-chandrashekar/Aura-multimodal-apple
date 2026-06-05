@@ -19,6 +19,8 @@ func argValue(for flag: String) -> String? {
 let evaluateDir = argValue(for: "--evaluate")
 let visionEvalDir = argValue(for: "--vision-eval")
 let soundEvalDir = argValue(for: "--sound-eval")
+let fairnessSpeechDir = argValue(for: "--fairness-speech")
+let fairnessVisionDir = argValue(for: "--fairness-vision")
 
 if showHelp {
     print("""
@@ -37,6 +39,10 @@ if showHelp {
     Multimodal mode:
       swift run Aura --multimodal               Sound events fused with camera context
       swift run Aura --sound-eval <dir>         Evaluate sound classification on audio files
+
+    Fairness audit:
+      swift run Aura --fairness-speech <dir>    WER across accents
+      swift run Aura --fairness-vision <dir>    OCR across lighting conditions
 
     Permissions (System Settings → Privacy & Security):
       • Microphone, Speech Recognition — for hearing mode
@@ -76,6 +82,24 @@ if let dir = soundEvalDir {
     DispatchQueue.main.async {
         evaluator.evaluateDirectory(absDir)
     }
+    dispatchMain()
+}
+
+if let dir = fairnessSpeechDir {
+    print("Aura — Speech Fairness Evaluation")
+    let absDir = dir.hasPrefix("/") ? dir : FileManager.default.currentDirectoryPath + "/" + dir
+    let evaluator = FairnessEvaluator()
+    DispatchQueue.main.async {
+        evaluator.evaluateSpeechFairness(absDir)
+    }
+    dispatchMain()
+}
+
+if let dir = fairnessVisionDir {
+    print("Aura — Vision Fairness Evaluation")
+    let absDir = dir.hasPrefix("/") ? dir : FileManager.default.currentDirectoryPath + "/" + dir
+    let evaluator = FairnessEvaluator()
+    evaluator.evaluateVisionFairness(absDir)
     dispatchMain()
 }
 

@@ -53,10 +53,27 @@ F1 measured on 6 synthetic test clips (alarm, bell, knock, speech × 2, silence)
 
 | Metric | Value |
 |---|---|
-| Task-completion rate (%) | _tbd_ |
-| Satisfaction (SUS) | _tbd_ |
-| Significance (p) | _tbd_ |
-| WER disparity across accents — before / after | _tbd_ |
+| Task-completion rate (%) | 100 (11/11 scripted tasks) |
+| Time-on-task — mean / median (ms) | 2812 / 2454 |
+| Quality score — mean ± std (%) | 92.5 ± 11.8 |
+| Satisfaction (SUS) | Pending user questionnaire (framework built) |
+| Kruskal-Wallis across accents (p) | 0.42 (n=1 per group) |
+
+**Speech WER across accents:**
+
+| Accent | WER before (%) | WER after enhancement (%) |
+|---|---|---|
+| US female (Samantha) | 7.1 | 7.1 |
+| US male (Fred) | 42.9 | 42.9 |
+| GB male (Daniel) | 7.1 | 7.1 |
+| AU female (Karen) | 10.7 | 10.7 |
+| IE female (Moira) | 7.1 | 7.1 |
+| IN male (Rishi) | 7.1 | 7.1 |
+| **Disparity (max − min)** | **35.7 pp** | **35.7 pp** |
+
+The outlier (Fred, 42.9%) is a robotic/monotone TTS voice simulating unusual speech patterns. Enhancement (DNS48) targets noise, not voice quality, so it does not reduce this disparity. Mitigation requires voice-characteristic-aware preprocessing — a known open problem in speech recognition fairness.
+
+**Vision OCR across lighting:** 100% recall at all 5 brightness levels (0.2× to 2.5×). Disparity: 0 pp. Apple's VNRecognizeTextRequest is robust to lighting variation.
 
 ## Architecture
 
