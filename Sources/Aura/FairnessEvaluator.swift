@@ -189,7 +189,7 @@ final class FairnessEvaluator {
         print("\n" + String(repeating: "═", count: 55))
         print("SPEECH FAIRNESS RESULTS")
         print(String(repeating: "═", count: 55))
-        print(String(format: "\n  %-15s %-10s %s", "Accent", "WER (%)", "Latency (ms)"))
+        print("\n  " + "Accent".padding(toLength: 15, withPad: " ", startingAt: 0) + " " + "WER (%)".padding(toLength: 10, withPad: " ", startingAt: 0) + " Latency (ms)")
         print("  " + String(repeating: "─", count: 45))
 
         var wers: [Double] = []
@@ -198,7 +198,7 @@ final class FairnessEvaluator {
             let wer = r["wer"] as? Double ?? 1.0
             let lat = r["latency_ms"] as? Double ?? 0
             wers.append(wer)
-            print(String(format: "  %-15s %-10.1f %.0f", accent, wer * 100, lat))
+            print("  " + accent.padding(toLength: 15, withPad: " ", startingAt: 0) + " " + String(format: "%.1f", wer * 100).padding(toLength: 10, withPad: " ", startingAt: 0) + " " + String(format: "%.0f", lat))
         }
 
         if let minWer = wers.min(), let maxWer = wers.max() {
@@ -221,7 +221,7 @@ final class FairnessEvaluator {
         print("\n" + String(repeating: "═", count: 55))
         print("VISION FAIRNESS RESULTS")
         print(String(repeating: "═", count: 55))
-        print(String(format: "\n  %-20s %-12s %s", "Condition", "Recall (%)", "Latency (ms)"))
+        print("\n  " + "Condition".padding(toLength: 20, withPad: " ", startingAt: 0) + " " + "Recall (%)".padding(toLength: 12, withPad: " ", startingAt: 0) + " Latency (ms)")
         print("  " + String(repeating: "─", count: 50))
 
         var recalls: [Double] = []
@@ -230,7 +230,7 @@ final class FairnessEvaluator {
             let recall = r["recall"] as? Double ?? 0
             let lat = r["latency_ms"] as? Double ?? 0
             recalls.append(recall)
-            print(String(format: "  %-20s %-12.0f %.0f", level, recall * 100, lat))
+            print("  " + level.padding(toLength: 20, withPad: " ", startingAt: 0) + " " + String(format: "%.0f", recall * 100).padding(toLength: 12, withPad: " ", startingAt: 0) + " " + String(format: "%.0f", lat))
         }
 
         if let minR = recalls.min(), let maxR = recalls.max() {

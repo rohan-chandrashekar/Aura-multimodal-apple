@@ -44,7 +44,7 @@ All phases complete. Project ready for demo recording and interview.
 Notes: M5 enhancement/ASR runs used a fresh random noise realization per the eval script (only SNR levels are fixed), so noisy/enhanced WER is not a strict A/B against the Intel draw. Sound-event F1 is dominated by which synthetic clips land near a class boundary — a test-set artifact, not a hardware regression. All M5 metrics are now measured; caption latency is comparable across machines because it is bound by recognizer finalization cadence and speaking pace, not compute, whereas the vision pipeline shows the expected Neural Engine speedup (28.9 vs 6.2 FPS).
 
 ## Reproduction note (M5)
-Setup used the system `python3` (3.9.6); `requirements.txt` installed cleanly. The detection-model conversion (`scripts/convert_detection_model.py`) also requires `ultralytics`, which is not listed in `requirements.txt` — install it before running that script.
+Setup used the system `python3` (3.9.6); `requirements.txt` installed cleanly. `ultralytics` (needed by `scripts/convert_detection_model.py`) is now listed in `requirements.txt`. The Swift summary-table printers in `FileEvaluator`/`FairnessEvaluator` previously segfaulted (exit 139) on a Swift-String-to-`%s` mismatch; this is fixed, so `--evaluate` and `--fairness-speech` now print their summary tables and exit cleanly.
 
 ## Next action
 All M5 benchmarks are measured (no TBDs remain). Record the demo video using DEMO.md, then prepare for interview.

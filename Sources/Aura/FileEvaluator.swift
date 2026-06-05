@@ -107,9 +107,9 @@ final class FileEvaluator {
 
         print("\n" + String(repeating: "─", count: 60))
         print("WER Summary:")
-        print(String(format: "  %-20s %s", "Condition", "WER (%)"))
+        print("  " + "Condition".padding(toLength: 20, withPad: " ", startingAt: 0) + " WER (%)")
         for (label, _, wer) in results {
-            print(String(format: "  %-20s %.1f", label, wer * 100))
+            print("  " + label.padding(toLength: 20, withPad: " ", startingAt: 0) + " " + String(format: "%.1f", wer * 100))
         }
     }
 }

@@ -1,6 +1,7 @@
 torch>=2.1
 torchaudio>=2.1
 denoiser>=0.1.5
+ultralytics>=8.0
 coremltools>=8.0
 numpy<2
 scipy>=1.11
