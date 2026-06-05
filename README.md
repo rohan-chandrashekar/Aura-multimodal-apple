@@ -16,12 +16,15 @@ Measured on this machine, not estimated. Filled in as each phase completes.
 
 ### Hearing mode (Phases 0–1)
 
-| Metric | Clean | Noisy | Enhanced |
+| Metric | Clean | Noisy (0 / 5 / 10 dB) | Enhanced (0 / 5 / 10 dB) |
 |---|---|---|---|
-| Word error rate (%) | 7.1 (Intel, en_IN) | _tbd_ | _tbd_ |
-| Caption latency — mean / median / p95 (ms) | 5672 / 5918 / 9041 (Intel) | — | _tbd_ |
-| SNR gain (dB) | — | — | _tbd_ |
+| Word error rate (%) | 7.1 | 60.7 / 32.1 / 35.7 | 78.6 / 53.6 / **17.9** |
+| SNR gain (dB) | — | — | +11.6 / +9.2 / +7.1 |
+| Enhancement model latency (ms, 4s chunk) | — | — | 1149 mean (Intel CPU) |
+| Caption latency — mean / median / p95 (ms) | 5672 / 5918 / 9041 | — | — |
 | Audio bytes written to disk | 0 | 0 | 0 |
+
+Enhancement model: Facebook DNS48 (Demucs), 18.9M parameters, 36 MB Core ML. SNR improves at all noise levels. WER improves at moderate noise (10 dB: 35.7% → 17.9%) but degrades at severe noise (0–5 dB) due to model artifacts that confuse the on-device recognizer — a well-documented phenomenon where signal-level improvement does not guarantee ASR improvement. All numbers measured on Intel i5 CPU.
 
 ### Vision mode (Phase 2)
 
@@ -70,8 +73,9 @@ Privacy:       audio/video processed in memory, never persisted; nothing leaves 
 ## Setup
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
+python3.12 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+python3 scripts/convert_enhancement_model.py   # downloads + converts DNS48 to Core ML
 swift build
 ```
 

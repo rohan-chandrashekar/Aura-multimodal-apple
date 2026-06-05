@@ -20,5 +20,7 @@ recordings/
 study-data/
 participants/
 
+test_audio/
+
 .env
 .DS_Store
