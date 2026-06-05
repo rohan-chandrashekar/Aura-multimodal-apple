@@ -10,7 +10,8 @@ final class VisionEvaluator {
     init() {
         let modelPath = "models/ObjectDetector.mlpackage"
         let url = URL(fileURLWithPath: modelPath)
-        if let mlModel = try? MLModel(contentsOf: url),
+        if let compiledURL = try? MLModel.compileModel(at: url),
+           let mlModel = try? MLModel(contentsOf: compiledURL),
            let vnModel = try? VNCoreMLModel(for: mlModel) {
             detectionModel = vnModel
         }

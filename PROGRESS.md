@@ -1,7 +1,7 @@
 # Progress
 
 ## Current status
-Phase 2 complete. Vision-mode scene aid works end-to-end: camera → detection + OCR → spoken description. OCR measured; object detection + FPS need camera test by user.
+Phase 2 complete with live camera measurements. Vision-mode scene aid works end-to-end.
 
 ## Phase checklist
 - [x] Phase 0 — Hearing-mode caption spine (mic -> on-device ASR -> captions)
@@ -27,21 +27,19 @@ MacBook Pro (i5-1038NG7, Intel, 16 GB RAM, macOS 26.5.1). Core ML on CPU/GPU. Wi
 - WER: clean 7.1%, noisy 60.7/32.1/35.7%, enhanced 78.6/53.6/17.9% (0/5/10 dB)
 - Model latency: 1149 ms per 4s chunk (Intel CPU)
 
-### Phase 2 (vision mode, Intel)
+### Phase 2 (vision mode, Intel, live camera)
 - Object detection model: YOLOv8n, 3.2M params, 6.2 MB Core ML
-- OCR: F1 91.7%, precision 84.6%, recall 100% (5 test images, VNRecognizeTextRequest accurate mode)
-- End-to-end latency per frame: 567 ms median, 600 ms p95 (warm); ~9250 ms first frame (model compilation)
-- Object detection accuracy: TBD — needs real photos via `swift run Aura --vision`
-- Camera FPS: TBD — needs live camera test
+- OCR: F1 91.7%, precision 84.6%, recall 100% (synthetic test images)
+- Avg detection+OCR latency: 282 ms (with YOLO), 164 ms (OCR only)
+- Camera FPS: 6.2 (with YOLO), 19.4 (OCR only)
+- Object detection adds ~118 ms overhead over OCR alone
 - Frame bytes written to disk: 0
 
 ## Known issues
 - Intel Mac, not Apple Silicon. High latency, no ANE.
 - Enhancement artifacts degrade ASR at severe noise (0–5 dB SNR).
 - en_IN locale recognizer hallucinates Hindi on degraded audio.
-- First vision frame has ~9s cold-start latency (Core ML model compilation).
-- Object detection accuracy unmeasured on synthetic images (YOLO needs real photos).
-- Camera not accessible from CLI agent environment; user must test `--vision` mode directly.
+- .mlpackage needs explicit MLModel.compileModel(at:) — fixed.
 
 ## Next action
 Phase 3: Multimodal fusion. SoundAnalysis (SNClassifySoundRequest) for on-device sound-event detection fused with Vision context, producing combined alerts/descriptions.

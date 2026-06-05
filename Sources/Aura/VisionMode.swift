@@ -123,10 +123,12 @@ final class VisionMode: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         }
 
         do {
+            let compiledURL = try MLModel.compileModel(at: url)
             let config = MLModelConfiguration()
             config.computeUnits = .all
-            let mlModel = try MLModel(contentsOf: url, configuration: config)
+            let mlModel = try MLModel(contentsOf: compiledURL, configuration: config)
             detectionModel = try VNCoreMLModel(for: mlModel)
+            print("Object detection model loaded.")
         } catch {
             print("Failed to load detection model: \(error.localizedDescription)")
         }

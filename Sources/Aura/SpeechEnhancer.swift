@@ -10,9 +10,10 @@ final class SpeechEnhancer {
 
     init(modelPath: String, sampleRate: Int = 16000, chunkSeconds: Int = 4) throws {
         let url = URL(fileURLWithPath: modelPath)
+        let compiledURL = try MLModel.compileModel(at: url)
         let config = MLModelConfiguration()
         config.computeUnits = .all
-        self.model = try MLModel(contentsOf: url, configuration: config)
+        self.model = try MLModel(contentsOf: compiledURL, configuration: config)
         self.sampleRate = sampleRate
         self.chunkSamples = sampleRate * chunkSeconds
     }
