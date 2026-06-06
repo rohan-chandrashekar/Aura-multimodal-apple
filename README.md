@@ -2,6 +2,14 @@
 
 A private, real-time perceptual aid for blind/low-vision and deaf/hard-of-hearing users, running entirely on-device. It describes the scene and reads text aloud, captions and enhances speech, and fuses sound events with visual context — with no camera or microphone data ever leaving the device.
 
+**Highlights — every number genuinely measured on Apple M5 (Core ML on the Neural Engine):**
+
+- **~88× speedup** moving the speech denoiser onto the Neural Engine: **1149 ms → 13 ms** per 4 s chunk — fast enough to run in real time.
+- **28.9 FPS** live vision — YOLOv8n detection + OCR + spoken description, end-to-end at **65 ms**.
+- **3.6% word error rate** on-device clean-speech captioning (`requiresOnDeviceRecognition = true`).
+- **0 bytes** written to disk, **0 bytes** sent over the network — provable with `lsof`.
+- Fairness audit across **6 English accents** and **5 lighting conditions** with scipy significance testing.
+
 Built on Apple's native stack: **AVFoundation**, **Speech** (on-device), **SoundAnalysis**, **Vision**, **AVSpeechSynthesizer**, and **Core ML**.
 
 **Current hardware:** Apple M5 (macOS 26.5.1). Core ML runs on the Neural Engine. Earlier benchmarks were taken on a MacBook Pro (i5-1038NG7, 16 GB, Core ML on CPU/GPU); both sets of numbers are reported side by side below.
