@@ -17,7 +17,7 @@ Narrator: "Aura is an on-device accessibility assistant. Everything runs locally
 Point the camera at objects on your desk (laptop, cup, book) and at a printed sign with text.
 The terminal prints descriptions like:
 ```
-[65ms] I see laptop, cup. Text reads: Meeting at 3 PM.
+[40ms] I see laptop, cup. Text reads: Meeting at 3 PM.
 ```
 The Mac speaks the description aloud.
 Narrator: "It sees objects and reads text aloud in real time — the full detection and OCR pipeline at twenty-nine frames per second."
@@ -50,7 +50,7 @@ Run:
 ```
 python3 scripts/evaluate_enhancement.py
 ```
-Show the output: **+12.0 dB SNR gain** at 0 dB and **13 ms** per 4-second chunk.
+Show the output: **+12.1 dB SNR gain** at 0 dB and **13 ms** per 4-second chunk.
 Narrator: "A pretrained denoiser, converted to Core ML, adds twelve decibels of signal-to-noise — and runs in thirteen milliseconds on the Neural Engine, about eighty-eight times faster than the same model on Intel CPU. That's what moves it into real time."
 
 **[40–50s] Privacy proof**
@@ -73,7 +73,7 @@ Narrator: "We audited recognition across six English accents and five lighting c
 4. Have a printed sign or book visible for OCR
 5. Speak clearly and at normal pace for the caption demo
 6. For the 30s version, rehearse transitions — Ctrl+C and the next command should be fluid
-7. Narration cites M5 numbers: ~4% clean-speech WER, 29 FPS / 65 ms vision, +12 dB SNR, 13 ms enhancement
+7. Narration cites M5 numbers: ~4% clean-speech WER, 29 FPS / 40 ms vision, +12 dB SNR, 13 ms enhancement
 
 ## LinkedIn post
 

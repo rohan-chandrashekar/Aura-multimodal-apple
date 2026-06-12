@@ -5,7 +5,7 @@ A private, real-time perceptual aid for blind/low-vision and deaf/hard-of-hearin
 **Highlights — every number genuinely measured on Apple M5 (Core ML on the Neural Engine):**
 
 - **~88× speedup** moving the speech denoiser onto the Neural Engine: **1149 ms → 13 ms** per 4 s chunk — fast enough to run in real time.
-- **28.9 FPS** live vision — YOLOv8n detection + OCR + spoken description, end-to-end at **65 ms**.
+- **29.4 FPS** live vision — YOLOv8n detection + OCR + spoken description, end-to-end at **40 ms**.
 - **3.6% word error rate** on-device clean-speech captioning (`requiresOnDeviceRecognition = true`).
 - **0 bytes** written to disk, **0 bytes** sent over the network — provable with `lsof`.
 - Fairness audit across **6 English accents** and **5 lighting conditions** with scipy significance testing.
@@ -27,14 +27,14 @@ Every number below is genuinely measured on this machine, not estimated.
 | Metric | Clean | Noisy (0 / 5 / 10 dB) | Enhanced (0 / 5 / 10 dB) |
 |---|---|---|---|
 | WER — Intel i5 (%) | 7.1 | 60.7 / 32.1 / 35.7 | 78.6 / 53.6 / **17.9** |
-| WER — Apple M5 (%) | 3.6 | 25.0 / 3.6 / 3.6 | 42.9 / 25.0 / 3.6 |
+| WER — Apple M5 (%) | 3.6 | 35.7 / 14.3 / 3.6 | 42.9 / 28.6 / 3.6 |
 | SNR gain — Intel i5 (dB) | — | — | +11.6 / +9.2 / +7.1 |
-| SNR gain — Apple M5 (dB) | — | — | +12.0 / +9.4 / +7.3 |
+| SNR gain — Apple M5 (dB) | — | — | +12.1 / +9.5 / +7.3 |
 | Enhancement model latency (ms, 4s chunk) | — | — | 1149 mean (Intel CPU) / **13 mean, 12 median, 16 p95** (M5) |
-| Caption latency — mean / median / p95 (ms) | 5672 / 5918 / 9041 (Intel); 6301 / 6532 / 9082 (M5) | — | — |
+| Caption latency — mean / median / p95 (ms) | 5672 / 5918 / 9041 (Intel); 5405 / 5634 / 8484 (M5) | — | — |
 | Audio bytes written to disk | 0 | 0 | 0 |
 
-Enhancement model: Facebook DNS48 (Demucs), 18.9M parameters, 36 MB Core ML. SNR improves at all noise levels on both machines. The standout hardware difference is enhancement latency: **1149 ms on Intel CPU drops to 13 ms on the M5 Neural Engine — an ~88× speedup** that moves the denoiser comfortably into real-time territory. WER on the M5 (macOS 26.5.1) is lower across the board, reflecting both the newer on-device recognizer and a fresh noise realization (the noise is randomly drawn per run at each controlled SNR, so the noisy/enhanced WER values are not a strict A/B against the Intel draw — only the SNR levels are held fixed). As on Intel, enhancement helps WER at moderate noise but can hurt at severe noise (0 dB), a well-documented phenomenon where signal-level improvement does not guarantee ASR improvement. Caption latency is comparable across machines (M5 6301 ms mean vs Intel 5672 ms) because it is governed by the recognizer's finalization cadence and the reader's speaking pace, not by raw compute — the live M5 `--measure` reading scored 7.1% WER with on-device recognition confirmed and zero audio/network bytes.
+Enhancement model: Facebook DNS48 (Demucs), 18.9M parameters, 36 MB Core ML. SNR improves at all noise levels on both machines. The standout hardware difference is enhancement latency: **1149 ms on Intel CPU drops to 13 ms on the M5 Neural Engine — an ~88× speedup** that moves the denoiser comfortably into real-time territory. WER on the M5 (macOS 26.5.1) is lower across the board, reflecting the newer on-device recognizer. The noise is randomly drawn per run at each controlled SNR, so the noisy/enhanced WER values are not a strict A/B across machines or runs — only the SNR levels are held fixed. On the M5 the recognizer is robust enough to this noise that enhancement does not reduce WER: in the canonical run it ties at 10 dB and is worse at 0 and 5 dB, even though signal-level SNR gain is positive at every level (+12.1 / +9.5 / +7.3 dB) — the well-documented case where an SNR improvement does not guarantee an ASR improvement. Enhancement's value on the M5 is therefore the SNR gain and the real-time latency, not WER reduction. Caption latency on the M5 (5405 ms mean) is governed by the recognizer's finalization cadence and the reader's speaking pace, not raw compute; the live `--measure` reading scored 14.3% WER on a complete read — higher than the 3.6% file-based clean WER because of live mic/room acoustics and the 30 s capture window clipping the sentence tail — with on-device recognition confirmed and zero audio/network bytes. Per-run detail and ranges are in [`benchmarks/M5.md`](benchmarks/M5.md).
 
 ### Vision mode (Phase 2)
 
@@ -42,12 +42,12 @@ Enhancement model: Facebook DNS48 (Demucs), 18.9M parameters, 36 MB Core ML. SNR
 |---|---|
 | Object detection model | YOLOv8n, 3.2M params, 6.2 MB Core ML |
 | OCR F1 / precision / recall (%) | 91.7 / 84.6 / 100.0 (Intel) |
-| OCR latency on text images (ms) | ~32 steady-state (M5, fairness images); 164 OCR-only (Intel) |
-| Avg detection+OCR latency (ms, live) | 282 (Intel, with YOLO); **65 (M5)** |
-| Camera FPS (live) | 6.2 (Intel, with YOLO); **28.9 (M5)** |
+| OCR latency on text images (ms) | ~33–36 steady-state (M5, fairness images; 263 first-image warm-up); 164 OCR-only (Intel) |
+| Avg detection+OCR latency (ms, live) | 282 (Intel, with YOLO); **40 (M5)** |
+| Camera FPS (live) | 6.2 (Intel, with YOLO); **29.4 (M5)** |
 | Frame bytes written to disk | 0 |
 
-OCR evaluated on synthetic text images (signs, labels, meeting info). Live camera FPS and detection+OCR latency were measured on both machines (`swift run Aura --vision`): the M5 runs the full YOLOv8n + OCR pipeline at **28.9 FPS / 65 ms — ~4.7× the frame rate and ~4.3× lower latency than Intel** (6.2 FPS / 282 ms), measured over an 82 s session (37 processed frames). The M5 steady-state OCR-only latency above (~32 ms, after a ~5.8 s first-image warm-up) is measured on the fairness lighting images via `--fairness-vision`, which exercises the same `VNRecognizeTextRequest` path without a camera.
+OCR evaluated on synthetic text images (signs, labels, meeting info). Live camera FPS and detection+OCR latency were measured on both machines (`swift run Aura --vision`): the M5 runs the full YOLOv8n + OCR pipeline at **29.4 FPS / 40 ms — ~4.7× the frame rate and ~7× lower latency than Intel** (6.2 FPS / 282 ms), measured over a 91.8 s session (242 processed frames). The M5 steady-state OCR-only latency above (~33–36 ms, after a 263 ms first-image warm-up) is measured on the fairness lighting images via `--fairness-vision`, which exercises the same `VNRecognizeTextRequest` path without a camera. Live FPS/latency vary run-to-run; see [`benchmarks/M5.md`](benchmarks/M5.md).
 
 ### Multimodal sound awareness (Phase 3)
 
@@ -55,7 +55,7 @@ OCR evaluated on synthetic text images (signs, labels, meeting info). Live camer
 |---|---|---|
 | Sound-event detection F1 (synthetic test) | 44.4% | 25.0% (precision 50.0%, recall 16.7%) |
 | Sound-event detection — speech accuracy | 100% (2/2) | 50% (1/2) |
-| Fusion latency (ms) | <1 (sound only), ~282 with vision | <1 (sound only), ~65 with vision |
+| Fusion latency (ms) | <1 (sound only), ~282 with vision | <1 (sound only); ~23 end-to-end fused alert (n=14) |
 | On-device | confirmed | confirmed (SNClassifySoundRequest .version1) |
 
 F1 measured on 6 synthetic test clips (alarm, bell, knock, speech × 2, silence), regenerated per run with macOS TTS and synthesis. The synthetic alarm/bell/knock sounds don't match the classifier's real-world training distribution, so F1 is dominated by which synthetic clips happen to land near a class boundary — on the M5 run, one of the two speech clips and all three non-speech clips went undetected, pulling F1 to 25.0%. This is a limitation of the synthetic test set, not a hardware regression; live testing with `swift run Aura --multimodal` is the meaningful real-world check.
@@ -65,7 +65,7 @@ F1 measured on 6 synthetic test clips (alarm, bell, knock, speech × 2, silence)
 | Metric | Intel i5 | Apple M5 |
 |---|---|---|
 | Task-completion rate (%) | 100 (11/11) | 100 (11/11) |
-| Time-on-task — mean / median (ms) | 2812 / 2454 | 745 / 185 |
+| Time-on-task — mean / median (ms) | 2812 / 2454 | 218 / 164 |
 | Quality score — mean ± std (%) | 92.5 ± 11.8 | 95.5 ± 7.9 |
 | Satisfaction (SUS) | Pending user questionnaire (framework built) | Pending |
 | Kruskal-Wallis across accents | p = 0.42 (n=1 per group) | H = 5.00, p = 0.4159 (n=1 per group) |
@@ -82,7 +82,7 @@ F1 measured on 6 synthetic test clips (alarm, bell, knock, speech × 2, silence)
 | IN male (Rishi) | 7.1 | 7.1 | 3.6 |
 | **Disparity (max − min)** | **35.7 pp** | **35.7 pp** | **25.0 pp** |
 
-On both machines the outlier is Fred (robotic/monotone TTS simulating unusual speech patterns): 42.9% on Intel, 28.6% on M5. The disparity narrows from 35.7 pp to 25.0 pp on the M5's newer on-device recognizer, but Fred remains by far the worst case. Enhancement (DNS48) targets noise, not voice quality, so it does not reduce this disparity (the Intel before/after columns are identical); the M5 enhancement-mitigation pass was not run. Mitigation requires voice-characteristic-aware preprocessing — a known open problem in speech recognition fairness. The Kruskal-Wallis test is not significant (M5: H = 5.00, p = 0.4159) because there is only one sample per accent group; collecting multiple utterances per voice is the next step.
+On both machines the outlier is Fred (robotic/monotone TTS simulating unusual speech patterns): 42.9% on Intel, 28.6% on M5. The disparity narrows from 35.7 pp to 25.0 pp on the M5's newer on-device recognizer, but Fred remains by far the worst case. Enhancement (DNS48) targets noise, not voice quality: on Intel it does not reduce this disparity at all (the before/after columns are identical). The M5 mitigation pass was run this session and modestly narrowed the disparity from 25.0 pp to 17.9 pp (Fred 28.6 → 21.4%) — an incidental gain, not a fix; the robotic-voice outlier persists. Closing it properly requires voice-characteristic-aware preprocessing — a known open problem in speech recognition fairness. The Kruskal-Wallis test is not significant (M5: H = 5.00, p = 0.4159) because there is only one sample per accent group; collecting multiple utterances per voice is the next step.
 
 **Vision OCR across lighting:** 100% recall at all 5 brightness levels (0.2× to 2.5×) on both Intel and M5. Disparity: 0 pp on both; the M5 Wilcoxon signed-rank test for the mitigation pass is W = 0.00, p = 1.0000 (no change, because recall is already saturated). Apple's VNRecognizeTextRequest is robust to lighting variation.
 

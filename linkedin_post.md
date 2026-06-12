@@ -11,9 +11,9 @@ Built **Aura** — an on-device multimodal accessibility assistant for blind/low
 The result I'm proudest of: I moved a pretrained speech-enhancement model onto the **M5 Neural Engine** and watched per-chunk latency drop from **1149 ms to 13 ms — an ~88× speedup** that turns a too-slow denoiser into a real-time one.
 
 What it does:
-- Describes the scene and reads text aloud — Vision + OCR + TTS, **28.9 FPS / 65 ms**
+- Describes the scene and reads text aloud — Vision + OCR + TTS, **29.4 FPS / 40 ms**
 - Captions speech in real time — on-device ASR, **3.6% WER** on clean speech
-- Enhances speech in noise — **+12.0 dB SNR gain** at 0 dB
+- Enhances speech in noise — **+12.1 dB SNR gain** at 0 dB
 - Fuses sound events with visual context for deaf users — SoundAnalysis + Vision
 
 Built for trust:
@@ -33,7 +33,7 @@ GitHub: https://github.com/rohan-chandrashekar/Aura-multimodal-apple
 
 On-device multimodal accessibility assistant, built on Apple's native ML stack — describes scenes, reads text aloud, captions speech, and alerts deaf users to sounds. All local; nothing leaves the device.
 
-Highlight: moving the speech denoiser to the **M5 Neural Engine** cut latency **1149 ms → 13 ms (~88×)** — real-time. Vision runs at **28.9 FPS**, ASR at **3.6% WER**, with **0 bytes to disk and 0 to the network**.
+Highlight: moving the speech denoiser to the **M5 Neural Engine** cut latency **1149 ms → 13 ms (~88×)** — real-time. Vision runs at **29.4 FPS**, ASR at **3.6% WER**, with **0 bytes to disk and 0 to the network**.
 
 Every number measured, not estimated.
 

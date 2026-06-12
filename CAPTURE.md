@@ -4,7 +4,7 @@ A run sheet for grabbing the visuals for the LinkedIn post. Read this on the mac
 
 ## ⚠️ Capture on the M5 — never on Intel
 
-Every screenshot must come from the **Apple M5** (Neural Engine). On the Intel i5 the same commands print the *slow* numbers (≈6.2 FPS, ≈282 ms vision; ≈1149 ms enhancement) — those would contradict the 28.9 FPS / 13 ms claims in the post and undercut its credibility. The whole point of the visuals is the M5 numbers, so shoot there.
+Every screenshot must come from the **Apple M5** (Neural Engine). On the Intel i5 the same commands print the *slow* numbers (≈6.2 FPS, ≈282 ms vision; ≈1149 ms enhancement) — those would contradict the 29.4 FPS / 13 ms claims in the post and undercut its credibility. The whole point of the visuals is the M5 numbers, so shoot there.
 
 The live camera demo has to be driven by you interactively (grant the permission prompts) — it can't be automated.
 
@@ -53,7 +53,7 @@ Point the camera at your desk plus a printed sign. Let it print a few lines like
 ```
 [65ms] I see laptop, cup. Text reads: Meeting at 3 PM.
 ```
-Then `Ctrl+C` so the **FPS / latency summary** prints (look for ~28.9 FPS). Screenshot the terminal with both the detection lines and the FPS stat visible. This is "it actually works, on-device, fast."
+Then `Ctrl+C` so the **FPS / latency summary** prints (look for ~29 FPS). Screenshot the terminal with both the detection lines and the FPS stat visible. This is "it actually works, on-device, fast."
 
 ### Shot 3 — Results card (no app run needed)
 Screenshot the rendered **Highlights** block at the top of `README.md` on GitHub. Clean, all the headline numbers in one frame, and it's your own real docs — honest and effortless. Good as a carousel slide or a fallback.
